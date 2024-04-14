@@ -3,12 +3,24 @@
         <div class="row">
             <!-- Danh mục -->
             <div class="mt-3 col-lg-2 col-md-3 me-3" style="border: grey solid 1px; height: 100%;">
+                <!-- Thể loại -->
                 <div class="category-list mt-3" style="display: flex; flex-wrap: wrap;">
                     <h5 class="category-title" style="flex-basis: 100%; margin-bottom: 1rem;">Thể Loại</h5>
                     <div v-for="(genre, index) in genres" :key="index">
                         <button type="button" class="btn btn-light text-start mb-1" data-bs-toggle="button"
                             @click="toggleGenre(genre)">
                             {{ genre }}
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Nhà xuất bản -->
+                <div class="category-list mt-3" style="display: flex; flex-wrap: wrap;">
+                    <h5 class="category-title" style="flex-basis: 100%; margin-bottom: 1rem;">Nhà xuất bản</h5>
+                    <div v-for="(publisher, index) in publishers" :key="index">
+                        <button type="button" class="btn btn-light text-start mb-1" data-bs-toggle="button"
+                            @click="togglePublisher(publisher)">
+                            {{ publisher }}
                         </button>
                     </div>
                 </div>
@@ -25,6 +37,7 @@
 <script>
 import ProductList from "@/components/home/ProductList.vue";
 import ProductService from "@/services/book.service";
+
 export default {
     components: {
         ProductList,
@@ -34,33 +47,54 @@ export default {
             products: [],
             activeIndex: -1,
             selectedGenres: [],
+            selectedPublishers: [],
             genres: [],
+            publishers: [],
         };
     },
     computed: {
         filteredProducts() {
-            if (!this.selectedGenres.length) return this.products;
-            return this.products.filter(contact => this.selectedGenres.includes(contact.genre));
+            let filtered = this.products;
+
+            // Lọc theo thể loại
+            if (this.selectedGenres.length > 0) {
+                filtered = filtered.filter(product => this.selectedGenres.includes(product.genre));
+            }
+
+            // Lọc theo nhà xuất bản
+            if (this.selectedPublishers.length > 0) {
+                filtered = filtered.filter(product => this.selectedPublishers.includes(product.publisher));
+            }
+
+            return filtered;
         },
         filteredProductsCount() {
             return this.filteredProducts.length;
-        },
+        }
     },
     methods: {
         async retrieveProducts() {
             try {
                 this.products = await ProductService.getAll();
                 this.genres = this.extractGenres(this.products);
+                this.publishers = this.extractPublisher(this.products);
             } catch (error) {
                 console.log(error);
             }
         },
-        extractGenres(products) {
-            const genresSet = new Set();
-            products.forEach(contact => {
-                genresSet.add(contact.genre);
+        extractPublisher(products) {
+            const publishers = new Set();
+            products.forEach(product => {
+                publishers.add(product.publisher);
             });
-            return Array.from(genresSet);
+            return Array.from(publishers);
+        },
+        extractGenres(products) {
+            const genres = new Set();
+            products.forEach(product => {
+                genres.add(product.genre);
+            });
+            return Array.from(genres);
         },
         refreshList() {
             this.retrieveProducts();
@@ -71,6 +105,13 @@ export default {
                 this.selectedGenres = this.selectedGenres.filter(item => item !== genre);
             } else {
                 this.selectedGenres.push(genre);
+            }
+        },
+        togglePublisher(publisher) {
+            if (this.selectedPublishers.includes(publisher)) {
+                this.selectedPublishers = this.selectedPublishers.filter(item => item !== publisher);
+            } else {
+                this.selectedPublishers.push(publisher);
             }
         }
     },

@@ -14,7 +14,7 @@ export default {
         async addToCart(productId) {
             const quantity = 1;
             const userId = Cookies.get("userId");
-            const bookId = productId; // Sử dụng productId được truyền vào từ nút Thêm vào giỏ hàng
+            const bookId = productId;
 
             const books = [{ bookId, quantity }];
             const cartData = { userId, books };
@@ -37,13 +37,14 @@ export default {
 <template>
     <div class="row">
         <div class="col-lg-4 col-md-6 col-sm-12 mb-4" v-for="(product, index) in products" :key="product._id">
-            <div class="card card_product" style="height: 450px;" @mouseover="updateActiveIndex(index)"
+            <div class="card card_product" style="height: 500px;" @mouseover="updateActiveIndex(index)"
                 @mouseleave="updateActiveIndex(-1)">
                 <img :src="product.imageUrl" class="card-img-top mt-3 align-self-center d-flex " alt="Hình ảnh"
                     style="height: 200px; width: 200px; object-fit: contain;">
                 <div class="card-body">
                     <h5 class="card-title" style="height: 30%;">{{ product.title }}</h5>
                     <p class="card-text">Tác giả: {{ product.author }}</p>
+                    <p class="card-text">Nhà xuất bản: {{ product.publisher }}</p>
                     <p class="card-text">Thể loại: {{ product.genre }}</p>
                     <p class="card-text">Số lượng còn lại: {{ product.quantity }}</p>
                 </div>
