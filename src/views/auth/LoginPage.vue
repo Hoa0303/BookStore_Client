@@ -34,7 +34,7 @@ export default {
                 if (res.role == false) {
                     Cookies.set('userId', res._id);
                     Cookies.set('userName', res.name);
-                    this.$router.push({ name: 'home' });
+                    window.location.href = '/';
                 }
                 else {
                     this.message = 'Tài khoản hoặc mật khẩu không chính xác!'

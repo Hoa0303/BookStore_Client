@@ -112,6 +112,7 @@
 <script>
 import CartService from "@/services/cart.service";
 import OrderService from "@/services/order.service";
+import BookService from "@/services/book.service";
 import Cookies from 'js-cookie';
 export default {
     props: {
@@ -167,6 +168,14 @@ export default {
             try {
                 await OrderService.add(loanInfo);
                 await CartService.deleteCart(this.userId);
+                for (let i = 0; i < loanInfo.books.length; i++) {
+                    const bookId = loanInfo.books[i].bookId;
+                    const bookInfo = await BookService.get(bookId);
+                    const data = {
+                        quantity: bookInfo.quantity - loanInfo.books[i].quantity,
+                    };
+                    await BookService.update(bookId, data);
+                }
                 alert("Bạn đã đăng ký mượn thành công, vui lòng chờ duyệt đơn!");
                 window.location.reload();
             } catch (error) {

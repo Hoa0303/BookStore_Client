@@ -12,6 +12,7 @@
 <script>
 import ContactForm from "@/components/profile/ProfileFrom.vue";
 import AuthService from "@/services/auth.service";
+import Cookies from "js-cookie";
 export default {
     components: {
         ContactForm,
@@ -45,7 +46,9 @@ export default {
         async updateContact(data) {
             try {
                 await AuthService.update(this.contact._id, data);
-                window.alert("Thông tin đã được thay đổi")
+                Cookies.set('userName', data.name);
+                window.alert("Thông tin đã được thay đổi");
+                window.location.reload();
                 this.$router.push({ name: "profile" });
             } catch (error) {
                 console.log(error);

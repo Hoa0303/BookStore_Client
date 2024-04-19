@@ -5,11 +5,11 @@
                 <div class="d-flex justify-content-between">
                     <h5 class="mb-0">{{ order.name }}</h5>
                     <span :class="{
-            'text-warning': order.status === 'Đang đợi duyệt',
-            'text-info': order.status === 'Đang mượn',
-            'text-primary': order.status === 'Đã trả',
-            'text-danger': order.status === 'Đã hủy' || order.status === 'Quá hạn trả'
-        }">{{ order.status }}</span>
+                        'text-warning': order.status === 'Đang đợi duyệt',
+                        'text-info': order.status === 'Đang mượn',
+                        'text-primary': order.status === 'Đã trả',
+                        'text-danger': order.status === 'Đã hủy' || order.status === 'Quá hạn trả' || order.status === 'Yêu cầu hủy đơn'
+                    }">{{ order.status }}</span>
                 </div>
                 <p class="mb-0">Ngày mượn: {{ order.ngayMuon }} | Ngày trả: {{ order.ngayTra }}</p>
             </div>
@@ -57,16 +57,16 @@ export default {
         async submit(id) {
             if (confirm("Bạn có chắc chắn muốn hủy đơn hàng này không?")) {
                 const submitData = {
-                    status: "Đã hủy"
+                    status: "Yêu cầu hủy đơn",
+                    req: 1
                 };
                 const check = await OrderService.update(id, submitData);
                 if (check) {
-                    alert("Đã hủy thành công!");
+                    alert("Đã yêu cầu thành công!");
                     window.location.reload();
                 }
             }
         }
-
     },
 };
 </script>

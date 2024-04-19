@@ -1,6 +1,7 @@
 <script>
 import CartService from "@/services/cart.service";
 import Cookies from 'js-cookie';
+
 export default {
     props: {
         products: { type: Array, default: [] },
@@ -11,11 +12,21 @@ export default {
         updateActiveIndex(index) {
             this.$emit("update:activeIndex", index);
         },
-        async addToCart(productId) {
-            const quantity = 1;
-            const userId = Cookies.get("userId");
-            const bookId = productId;
+        async addToCart(productId, number) {
+            // Kiểm tra nếu số lượng là 0 thì không thể thêm vào giỏ hàng
+            if (number === 0) {
+                alert("Số lượng sách không đủ!");
+                return;
+            }
 
+            const userId = Cookies.get("userId");
+            if (!userId) {
+                this.$router.push({ name: 'login' });
+                return;
+            }
+
+            const quantity = 1;
+            const bookId = productId;
             const books = [{ bookId, quantity }];
             const cartData = { userId, books };
 
@@ -29,7 +40,6 @@ export default {
                 alert("Đã xảy ra lỗi khi thêm vào giỏ hàng. Vui lòng thử lại sau!");
             }
         },
-
     }
 };
 </script>
@@ -49,7 +59,8 @@ export default {
                     <p class="card-text">Số lượng còn lại: {{ product.quantity }}</p>
                 </div>
                 <div class="position-absolute align-self-center d-flex" style="margin-top: 45%;">
-                    <button v-if="activeIndex === index" class="btn btn-light z-3" @click="addToCart(product._id)">
+                    <button v-if="activeIndex === index" class="btn btn-light z-3"
+                        @click="addToCart(product._id, product.quantity)">
                         <i class="fas fa-plus"></i> Thêm vào giỏ hàng
                     </button>
                 </div>

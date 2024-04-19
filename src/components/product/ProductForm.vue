@@ -82,11 +82,16 @@ export default {
     methods: {
         async checkFavorite() {
             const id = Cookies.get("userId");
+            if (!id) return;
             const userFavorites = await FavoriteService.get(id);
             this.check = userFavorites.bookId.includes(this.product._id);
         },
         async changeFavorite() {
             const id = Cookies.get("userId");
+            if (!id) {
+                this.$router.push({ name: 'login' });
+                return;
+            }
             const bookId = this.product._id;
             const userFavorites = await FavoriteService.get(id);
             const check = userFavorites.bookId.includes(this.product._id);
@@ -98,10 +103,17 @@ export default {
             await this.checkFavorite();
         },
         async addToCart() {
-            const quantity = this.quantity;
             const userId = Cookies.get("userId");
+            if (!userId) {
+                this.$router.push({ name: 'login' });
+                return;
+            }
             const bookId = this.product._id;
-
+            const quantity = this.quantity;
+            if (quantity > this.productLocal.quantity) {
+                alert("Số lượng yêu cầu vượt quá số lượng có sẵn của sản phẩm!");
+                return;
+            }
             const books = [{ bookId, quantity }];
             const cartData = { userId, books };
 
@@ -117,7 +129,9 @@ export default {
         },
 
         increaseQuantity() {
-            this.quantity++;
+            if (this.quantity < this.productLocal.quantity) {
+                this.quantity++;
+            }
         },
         decreaseQuantity() {
             if (this.quantity > 1) {
