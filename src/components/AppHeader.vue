@@ -27,7 +27,6 @@
                 </form>
 
                 <ul class="navbar-nav">
-                    <!-- Have account in Cookies -->
                     <li class="nav-item dropdown" v-if="userName">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                             data-bs-toggle="dropdown" aria-expanded="false">
@@ -62,11 +61,11 @@
                     </li>
                     <li class="nav-item ms-3 me-5" v-if="userName">
                         <router-link :to="{ name: 'cartpage', params: { id: userId }, }" class="nav-link">
+                            <span class="cart-count" v-if="cartItemCount > 0">{{ cartItemCount }}</span>
                             <i class="fas fa-shopping-cart"></i>
                         </router-link>
                     </li>
 
-                    <!-- No account in Cookies -->
                     <li class="nav-item ms-3" v-if="!userName">
                         <router-link :to="{ name: 'login' }" class="nav-link">
                             <i class="fas fa-user"></i>
@@ -85,16 +84,20 @@
 
 <script>
 import Cookies from 'js-cookie';
+import CartService from '@/services/cart.service';
+
 export default {
     data() {
         return {
             userName: '',
             userId: '',
             searchQuery: '',
+            cartItemCount: 0,
         };
     },
     mounted() {
         this.getUserNameFromCookie();
+        this.getCartItemCount();
     },
     methods: {
         getUserNameFromCookie() {
@@ -119,8 +122,32 @@ export default {
         search() {
             if (this.searchQuery.trim() !== '') {
                 this.$router.push({ name: 'search', params: { query: this.searchQuery } });
+            } else {
+                this.$router.push({ name: 'home' });
+            }
+        },
+        async getCartItemCount() {
+            try {
+                const response = await CartService.get(this.userId);
+                this.cartItemCount = response.length;
+            } catch (error) {
+                console.error("Error fetching cart item count:", error);
             }
         }
     }
 };
 </script>
+
+<style>
+.cart-count {
+    position: absolute;
+    right: 8em;
+    transform: translate(50%, -50%);
+    background-color: red;
+    color: white;
+    border-radius: 100%;
+    padding: 0.25em 0.5em;
+    font-size: 0.5em;
+    font-weight: bold;
+}
+</style>

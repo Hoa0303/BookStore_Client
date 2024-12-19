@@ -52,11 +52,11 @@ export default {
                 <img :src="product.imageUrl" class="card-img-top mt-3 align-self-center d-flex " alt="Hình ảnh"
                     style="height: 200px; width: 200px; object-fit: contain;">
                 <div class="card-body">
-                    <h5 class="card-title" style="height: 30%;">{{ product.title }}</h5>
-                    <p class="card-text">Tác giả: {{ product.author }}</p>
-                    <p class="card-text">Nhà xuất bản: {{ product.publisher }}</p>
+                    <h5 class="card-title text-center" style="height: 30%;">{{ product.title }}</h5>
+                    <p class="card-text">Tác giả: <span class="text-primary">{{ product.author }}</span></p>
+                    <p class="card-text">{{ product.publisher }}</p>
                     <p class="card-text">Thể loại: {{ product.genre }}</p>
-                    <p class="card-text">Số lượng còn lại: {{ product.quantity }}</p>
+                    <p class="card-text">Số lượng còn lại: <span class="text-danger">{{ product.quantity }}</span> </p>
                 </div>
                 <div class="position-absolute align-self-center d-flex" style="margin-top: 45%;">
                     <button v-if="activeIndex === index" class="btn btn-light z-3"

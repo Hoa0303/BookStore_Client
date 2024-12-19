@@ -12,6 +12,9 @@ class AuthService {
     async delete(userId, bookId) {
         return (await this.api.post("/delete", { userId, bookId })).data;
     }
+    async update(userId, bookId, newQuantity) {
+        return (await this.api.put("/update", { userId, bookId, newQuantity })).data;
+    }
     async deleteCart(id) {
         return (await this.api.delete(`/${id}`)).data;
     }

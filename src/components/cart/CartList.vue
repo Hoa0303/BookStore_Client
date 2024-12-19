@@ -44,11 +44,22 @@
                                                         class="d-flex flex-row align-items-center justify-content-between">
                                                         <!-- Hiển thị "Số lượng" và số lượng sản phẩm -->
                                                         <h6 class="fw-normal mb-0 me-3">Số lượng:</h6>
-                                                        <div class="row" style="width: 100px;">
-                                                            <h5 class="fw-normal mb-0">{{ product.quantity }}</h5>
+                                                        <div>
+                                                            <button class="btn btn-sm me-1"
+                                                                @click="updateProductQuantity(product._id, product.quantity - 1)"
+                                                                :disabled="product.quantity <= 1">
+                                                                <i class="fas fa-minus"></i>
+                                                            </button>
+                                                            <button class="btn btn-lg disabled">
+                                                                {{ product.quantity }}
+                                                            </button>
+                                                            <button class="btn btn-sm ms-1"
+                                                                @click="updateProductQuantity(product._id, product.quantity + 1)">
+                                                                <i class="fas fa-plus"></i>
+                                                            </button>
                                                         </div>
                                                         <!-- Nút xóa sản phẩm -->
-                                                        <button class="btn ml-3 btn-danger"
+                                                        <button class="ms-2 btn ml-3 btn-danger"
                                                             @click="deleteProduct(product._id)">
                                                             <i class="fas fa-trash-alt"></i>
                                                         </button>
@@ -121,11 +132,16 @@ export default {
     },
     emits: ["update:activeIndex"],
     data() {
+        const today = new Date();
+        const borrowDate = today.toISOString().split('T')[0];
+        const returnDate = new Date(today);
+        returnDate.setDate(returnDate.getDate() + 7);
+        const formattedReturnDate = returnDate.toISOString().split('T')[0];
         return {
             userId: Cookies.get("userId"),
             name: Cookies.get("userName"),
-            ngayMuon: '',
-            ngayTra: '',
+            ngayMuon: borrowDate,
+            ngayTra: formattedReturnDate,
             bookTitle: '',
             bookId: '',
             bookQuantity: 0,
@@ -143,6 +159,13 @@ export default {
             alert("Xóa sản phẩm khỏi giỏ hàng thành công!");
             window.location.reload();
         },
+        async updateProductQuantity(id, index) {
+            const userId = Cookies.get("userId");
+            const bookId = id;
+            const quantity = index;
+            await CartService.update(userId, bookId, quantity);
+            window.location.reload();
+        },
         addBookToLoan() {
             this.products.forEach(product => {
                 this.books.push({
@@ -153,9 +176,11 @@ export default {
             });
         },
         async submitForm() {
+            const confirmation = confirm("Bạn có chắc chắn muốn mượn các sách này?");
+            if (!confirmation) {
+                return;
+            }
             this.addBookToLoan();
-
-            // Tạo đối tượng loanInfo để lưu thông tin mượn sách
             const loanInfo = {
                 userId: this.userId,
                 name: this.name,
@@ -163,8 +188,6 @@ export default {
                 ngayTra: this.ngayTra,
                 books: this.books
             };
-
-            // Gửi thông tin mượn sách đi xử lý
             try {
                 await OrderService.add(loanInfo);
                 await CartService.deleteCart(this.userId);
